@@ -1,0 +1,15 @@
+<DataSource
+        ID="players"
+        serverType="sql"
+        tableName="players"
+        recordName="player"
+        testFileName="players.data.xml"
+        titleField="name">
+
+    <fields>
+        <field name="id" title="ID" type="sequence" primaryKey="true" hidden="true"/>
+        <field name="name" title="Name" type="text" length="128"/>
+        <field name="teamId" title="Team" optionsDataSource="teams" valueField="id" displayField="name"
+               foreignKey="teams.id"/>
+    </fields>
+</DataSource>

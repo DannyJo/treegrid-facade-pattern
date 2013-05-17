@@ -1,0 +1,11 @@
+<DataSource
+        ID="treegridfacade"
+        serverType="generic"
+        autoDeriveSchema="true"
+        serverConstructor="com.smartgwt.sample.server.TreeGridFacadeServerSideDataSource"
+        schemaBean="com.smartgwt.sample.server.TreeGridItem">
+
+    <fields>
+        <field name="id" title="id" type="text" primaryKey="true" hidden="true"/>
+    </fields>
+</DataSource>

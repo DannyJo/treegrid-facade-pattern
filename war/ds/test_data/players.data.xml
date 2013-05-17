@@ -1,0 +1,29 @@
+<List>
+    <!-- Warrington -->
+    <player>
+        <teamId>1</teamId>
+        <name>Chris Riley</name>
+    </player>
+    <player>
+        <teamId>1</teamId>
+        <name>Ryan Atkins</name>
+    </player>
+    <player>
+        <teamId>1</teamId>
+        <name>Lee Briers</name>
+    </player>
+    <player>
+        <teamId>1</teamId>
+        <name>Joel Monaghan</name>
+    </player>
+    <player>
+        <teamId>1</teamId>
+        <name>Trent Waterhouse</name>
+    </player>
+
+    <!-- Wigan -->
+    <player>
+        <teamId>2</teamId>
+        <name>Sam Tomkins</name>
+    </player>
+</List>
