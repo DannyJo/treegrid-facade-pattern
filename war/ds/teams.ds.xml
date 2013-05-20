@@ -9,13 +9,12 @@
     <fields>
         <field name="id" title="ID" type="sequence" primaryKey="true" hidden="true"/>
         <field name="name" title="Name" type="text" length="128"/>
-        <field name="playerCount" title="Players"
-               customSelectExpression="(SELECT count(*) FROM players where teamId = teams.id)" hidden="true"/>
     </fields>
-
-    <operationBindings>
-        <operationBinding operationType="fetch">
-            <orderClause>name</orderClause>
-        </operationBinding>
-    </operationBindings>
+    <!--
+        <operationBindings>
+            <operationBinding operationType="fetch">
+                <orderClause>name</orderClause>
+            </operationBinding>
+        </operationBindings>
+    -->
 </DataSource>

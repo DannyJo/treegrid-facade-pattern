@@ -40,8 +40,6 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
         buttonHStack.setMembersMargin(5);
 
         final Menu menu = new Menu();
-        menu.setShowShadow(false);
-        menu.setShadowDepth(0);
         menu.setShowIcons(false);
 
         final MenuItem addTeamMenuItem = new MenuItem("Team");
@@ -51,7 +49,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                 new AddEditModalDialog("Add Team", "teams", null, new DSCallback() {
                     @Override
                     public void execute(DSResponse response, Object rawData, DSRequest request) {
-                        teamsAndPlayersTree.updateCache(null, DSOperationType.UPDATE);
+                        teamsAndPlayersTree.updateCache();
                     }
                 }).show();
             }
@@ -64,7 +62,6 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                 new AddEditModalDialog("Add Player", "players", null, new DSCallback() {
                     @Override
                     public void execute(DSResponse response, Object rawData, DSRequest request) {
-                        teamsAndPlayersTree.updateCache(null, DSOperationType.UPDATE);
                         teamsAndPlayersTree.updateCache("teams:" + String.valueOf(request.getAttributeAsMap("data").get("teamId")), DSOperationType.UPDATE);
                     }
                 }).show();
@@ -84,7 +81,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                     return;
                 }
 
-                final String dataSourceName = teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("dataSource");
+                final String dataSourceName = teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("dataSourceName");
                 final Map data = teamsAndPlayersTree.getSelectedRecord().getAttributeAsMap("data");
 
                 // Create new dialog box and on data save, update the trees datasource cache.
@@ -93,8 +90,6 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                     public void execute(DSResponse response, Object rawData, DSRequest request) {
                         final String teamId = String.valueOf(request.getAttributeAsMap("data").get("teamId"));
                         final String parentId = teamId != null && !"null".equalsIgnoreCase(teamId) ? "teams:" + teamId : null;
-
-                        teamsAndPlayersTree.updateCache(null, DSOperationType.UPDATE);
                         teamsAndPlayersTree.updateCache(parentId, DSOperationType.UPDATE);
                     }
                 }).show();
@@ -115,7 +110,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                 SC.confirm("Are you sure you want to delete '" + teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("name") + "'?", new BooleanCallback() {
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            final String dataSourceName = teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("dataSource");
+                            final String dataSourceName = teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("dataSourceName");
                             final DataSource dataSource = DataSource.get(dataSourceName);
                             final Map data = teamsAndPlayersTree.getSelectedRecord().getAttributeAsMap("data");
                             final DSRequest request = new DSRequest(DSOperationType.REMOVE, new Criteria("id", String.valueOf(data.get("id"))));
@@ -125,9 +120,8 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                                 @Override
                                 public void execute(DSResponse response, Object rawData, DSRequest request) {
                                     // Once the record has been deleted from the underlying datasource lets issue a REMOVE to the tree's cache and get rid of this node.
-                                    final DSResponse deleteResponse = new DSResponse("treegridfacade", DSOperationType.REMOVE, teamsAndPlayersTree.getSelectedRecord());
+                                    final DSResponse deleteResponse = new DSResponse(teamsAndPlayersTree.getDataSource().getID(), DSOperationType.REMOVE, teamsAndPlayersTree.getSelectedRecord());
                                     teamsAndPlayersTree.updateCacheUsingResponse(deleteResponse);
-                                    teamsAndPlayersTree.updateCache(null, DSOperationType.UPDATE);
                                 }
                             }, request);
                         }
@@ -158,12 +152,11 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
     @Override
     public void modeChanged(final String newMode) {
         if ("server".equalsIgnoreCase(newMode)) {
-            teamsAndPlayersTree.setDataSource(DataSource.get("treegridfacade"));
+            teamsAndPlayersTree.setDataSource(DataSource.get("treeFacadeDS"));
         } else {
             teamsAndPlayersTree.setDataSource(new TreeGridFacadeClientSideDataSource());
         }
 
-        teamsAndPlayersTree.markForRedraw();
         teamsAndPlayersTree.fetchData();
     }
 }

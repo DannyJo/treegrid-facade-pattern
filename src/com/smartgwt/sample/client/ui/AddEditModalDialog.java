@@ -1,13 +1,7 @@
 package com.smartgwt.sample.client.ui;
 
-import com.smartgwt.client.data.DSCallback;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
-import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.FetchMode;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -15,6 +9,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 import java.util.Map;
@@ -51,30 +46,24 @@ public class AddEditModalDialog extends Window {
         });
     }
 
-    @Override
-    public void show() {
-        super.show();
-        form.focusInItem(0);
-    }
-
     private void createForm(final String dataSourceName, final Map data) {
         form.setDataSource(DataSource.get(dataSourceName));
-        form.setIsGroup(false);
-        form.setNumCols(2);
         form.setMargin(5);
-        form.setColWidths(60, "*");
-        form.setLayoutAlign(VerticalAlignment.BOTTOM);
         form.setLayoutAlign(Alignment.CENTER);
-        form.setDataFetchMode(FetchMode.BASIC);
+        form.setAutoFocus(true);
 
         if (data == null) {
-            form.setSaveOperationType(DSOperationType.ADD);
+            form.editNewRecord();
         } else {
-            form.setSaveOperationType(DSOperationType.UPDATE);
-            form.setValues(data);
+            form.editRecord(new Record(data));
         }
 
-        form.setValue("dataSource", dataSourceName);
+        // Add sorting by the name for the team dropdown
+        final SelectItem selectItem = (SelectItem) form.getField("teamId");
+
+        if (selectItem != null) {
+            selectItem.setSortField("name");
+        }
 
         addItem(form);
 
@@ -105,7 +94,6 @@ public class AddEditModalDialog extends Window {
         });
 
         final Button cancelButton = new Button("Cancel");
-
         cancelButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {

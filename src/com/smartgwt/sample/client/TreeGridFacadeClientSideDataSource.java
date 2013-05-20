@@ -2,6 +2,7 @@ package com.smartgwt.sample.client;
 
 import com.smartgwt.client.data.*;
 import com.smartgwt.client.rpc.RPCResponse;
+import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.FieldType;
 
@@ -24,21 +25,8 @@ public class TreeGridFacadeClientSideDataSource extends DataSource {
         final String requestId = request.getRequestId();
         final DSResponse response = new DSResponse();
 
-        switch (request.getOperationType()) {
-            case FETCH:
-                executeFetch(requestId, request, response);
-                break;
-            case ADD:
-                //executeAdd(requestId, request, response);
-                break;
-            case UPDATE:
-                //executeUpdate(requestId, request, response);
-                break;
-            case REMOVE:
-                //executeRemove(requestId, request, response);
-                break;
-            default:
-                break;
+        if (DSOperationType.FETCH.equals(request.getOperationType())) {
+            executeFetch(requestId, request, response);
         }
 
         return request.getData();
@@ -80,6 +68,7 @@ public class TreeGridFacadeClientSideDataSource extends DataSource {
             records[i].setAttribute("dataSource", "teams");
             records[i].setAttribute("data", recordList.get(i));
             records[i].setAttribute("isFolder", true);
+            records[i].setAttribute("canEdit", false);
             records[i].setAttribute("sourceId", recordList.get(i).getAttributeAsString("id"));
         }
 
@@ -97,6 +86,7 @@ public class TreeGridFacadeClientSideDataSource extends DataSource {
             records[i].setAttribute("icon", "player.png");
             records[i].setAttribute("dataSource", "players");
             records[i].setAttribute("isFolder", false);
+            records[i].setAttribute("canEdit", false);
             records[i].setAttribute("data", recordList.get(i));
             records[i].setAttribute("sourceId", recordList.get(i).getAttributeAsString("id"));
         }
