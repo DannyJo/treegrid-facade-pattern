@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.menu.IMenuButton;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.sample.client.TreeGridFacadeClientSideDataSource;
+import com.smartgwt.sample.client.TreeFacadeClientDS;
 
 import java.util.Map;
 
@@ -154,7 +154,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
         if ("server".equalsIgnoreCase(newMode)) {
             teamsAndPlayersTree.setDataSource(DataSource.get("treeFacadeDS"));
         } else {
-            teamsAndPlayersTree.setDataSource(new TreeGridFacadeClientSideDataSource());
+            teamsAndPlayersTree.setDataSource(new TreeFacadeClientDS());
         }
 
         teamsAndPlayersTree.fetchData();

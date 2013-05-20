@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TreeFacadeDS extends BasicDataSource {
@@ -17,7 +18,8 @@ public class TreeFacadeDS extends BasicDataSource {
 
     @Override
     public DSResponse executeFetch(final DSRequest request) throws Exception {
-        final DSResponse response = new DSResponse(new ArrayList());
+        final List<Map> treeItems = new ArrayList<Map>();
+        final DSResponse response = new DSResponse(treeItems);
         final String parentId = (String) request.getCriteriaValue("parentId");
 
         if (parentId != null) {
@@ -26,14 +28,14 @@ public class TreeFacadeDS extends BasicDataSource {
 
                 teamsResponse.getData();
                 for (final Object team : teamsResponse.getDataList()) {
-                    response.getDataList().add(convertToTreeItem((Map) team, TEAMS));
+                    treeItems.add(convertToTreeItem((Map) team, TEAMS));
                 }
             } else if ("players".equalsIgnoreCase(parentId)) {
                 final DSResponse playersResponse = new DSRequest("players", DataSource.OP_FETCH).execute();
 
                 for (final Object player : playersResponse.getDataList()) {
                     final Map playerMap = (Map) player;
-                    response.getDataList().add(convertToTreeItem(playerMap, PLAYERS));
+                    treeItems.add(convertToTreeItem(playerMap, PLAYERS));
                 }
             } else if (StringUtils.contains(parentId, ":")) {
                 final String teamId = StringUtils.substringAfter(parentId, ":");
@@ -42,7 +44,7 @@ public class TreeFacadeDS extends BasicDataSource {
                     final DSResponse playersResponse = new DSRequest("players", DataSource.OP_FETCH).setCriteria("teamId", teamId).execute();
 
                     for (final Object player : playersResponse.getDataList()) {
-                        response.getDataList().add(convertToTreeItem((Map) player, PLAYERS));
+                        treeItems.add(convertToTreeItem((Map) player, PLAYERS));
                     }
                 }
             }
@@ -51,7 +53,7 @@ public class TreeFacadeDS extends BasicDataSource {
 
             for (final Object team : teamsResponse.getDataList()) {
                 if (team != null) {
-                    response.getDataList().add(convertToTreeItem((Map) team, TEAMS));
+                    treeItems.add(convertToTreeItem((Map) team, TEAMS));
                 }
             }
         }

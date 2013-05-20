@@ -1,17 +1,17 @@
 package com.smartgwt.sample.client;
 
 import com.smartgwt.client.data.*;
-import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.FieldType;
 
-public class TreeGridFacadeClientSideDataSource extends DataSource {
+public class TreeFacadeClientDS extends DataSource {
 
-    public TreeGridFacadeClientSideDataSource() {
+    public TreeFacadeClientDS() {
         super();
 
         setDataProtocol(DSProtocol.CLIENTCUSTOM);
+        setAutoCacheAllData(true);
 
         final DataSourceField idField = new DataSourceField("id", FieldType.TEXT);
         final DataSourceField nameField = new DataSourceField("name", FieldType.TEXT);
@@ -36,11 +36,10 @@ public class TreeGridFacadeClientSideDataSource extends DataSource {
         final String parentId = request.getCriteria().getAttributeAsString("parentId");
 
         if (parentId == null) {
-            DataSource.get("teams").fetchData(new Criteria("", ""), new DSCallback() {
+            DataSource.get("teams").fetchData(null, new DSCallback() {
                 @Override
                 public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
-                    response.setStatus(RPCResponse.STATUS_SUCCESS);
-                    response.setData(getTeamRecords(fetchResponse.getDataAsRecordList()));
+                    response.setData(getRecords(fetchResponse.getDataAsRecordList(), "teams"));
                     processResponse(requestId, response);
                 }
             });
@@ -50,45 +49,32 @@ public class TreeGridFacadeClientSideDataSource extends DataSource {
             DataSource.get("players").fetchData(new Criteria("teamId", sourceId), new DSCallback() {
                 @Override
                 public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
-                    response.setStatus(RPCResponse.STATUS_SUCCESS);
-                    response.setData(getPlayerRecords(fetchResponse.getDataAsRecordList()));
+                    response.setData(getRecords(fetchResponse.getDataAsRecordList(), "players"));
                     processResponse(requestId, response);
                 }
             });
         }
     }
 
-    private Record[] getTeamRecords(final RecordList recordList) {
+    private Record[] getRecords(final RecordList recordList, final String dataSourceName) {
         final Record[] records = new Record[recordList.getLength()];
 
         for (int i = 0; i < recordList.getLength(); i++) {
             records[i] = new Record();
-            records[i].setAttribute("id", "teams:" + recordList.get(i).getAttributeAsString("id"));
-            records[i].setAttribute("name", recordList.get(i).getAttributeAsString("name") + " (" + recordList.get(i).getAttributeAsString("playerCount") + ")");
-            records[i].setAttribute("dataSource", "teams");
-            records[i].setAttribute("data", recordList.get(i));
-            records[i].setAttribute("isFolder", true);
-            records[i].setAttribute("canEdit", false);
-            records[i].setAttribute("sourceId", recordList.get(i).getAttributeAsString("id"));
-        }
 
-        return records;
-    }
+            if ("players".equalsIgnoreCase(dataSourceName)) {
+                records[i].setAttribute("parentId", "teams:" + recordList.get(i).getAttributeAsString("teamId"));
+                records[i].setAttribute("id", "players:" + recordList.get(i).getAttributeAsString("id"));
+                records[i].setAttribute("icon", "player.png");
+                records[i].setAttribute("isFolder", false);
+            } else {
+                records[i].setAttribute("id", "teams:" + recordList.get(i).getAttributeAsString("id"));
+                records[i].setAttribute("isFolder", true);
+            }
 
-    private Record[] getPlayerRecords(final RecordList recordList) {
-        final Record[] records = new Record[recordList.getLength()];
-
-        for (int i = 0; i < recordList.getLength(); i++) {
-            records[i] = new Record();
-            records[i].setAttribute("parentId", "teams:" + recordList.get(i).getAttributeAsString("teamId"));
-            records[i].setAttribute("id", "players:" + recordList.get(i).getAttributeAsString("id"));
             records[i].setAttribute("name", recordList.get(i).getAttributeAsString("name"));
-            records[i].setAttribute("icon", "player.png");
-            records[i].setAttribute("dataSource", "players");
-            records[i].setAttribute("isFolder", false);
-            records[i].setAttribute("canEdit", false);
+            records[i].setAttribute("dataSourceName", dataSourceName);
             records[i].setAttribute("data", recordList.get(i));
-            records[i].setAttribute("sourceId", recordList.get(i).getAttributeAsString("id"));
         }
 
         return records;

@@ -26,6 +26,7 @@ public class TeamsAndPlayersTree extends TreeGrid {
         getDataSource().fetchData(new Criteria("parentId", parentId), new DSCallback() {
             @Override
             public void execute(final DSResponse response, final Object rawData, final DSRequest request) {
+                response.setOperationType(operationType);
                 request.setOperationType(operationType);
                 getDataSource().updateCaches(response, request);
             }
