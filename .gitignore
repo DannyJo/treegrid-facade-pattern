@@ -1,6 +1,9 @@
 .idea/
 war/WEB-INF/classes/
 war/WEB-INF/deploy/
-*.iml
+out/
+war/WEB-INF/lib/*.iml
 *.iws
 *.class
+.classpath
+.project
