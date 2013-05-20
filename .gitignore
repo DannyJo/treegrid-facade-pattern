@@ -2,7 +2,8 @@
 war/WEB-INF/classes/
 war/WEB-INF/deploy/
 out/
-war/WEB-INF/lib/*.iml
+war/WEB-INF/lib/
+*.iml
 *.iws
 *.class
 .classpath
