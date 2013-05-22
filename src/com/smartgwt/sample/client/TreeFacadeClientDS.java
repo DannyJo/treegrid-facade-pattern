@@ -27,34 +27,30 @@ public class TreeFacadeClientDS extends DataSource {
         final DSResponse response = new DSResponse();
 
         if (DSOperationType.FETCH.equals(request.getOperationType())) {
-            executeFetch(requestId, request, response);
+            final String parentId = request.getCriteria().getAttributeAsString("parentId");
+
+            if (parentId == null) {
+                DataSource.get("teams").fetchData(null, new DSCallback() {
+                    @Override
+                    public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
+                        response.setData(getRecords(fetchResponse.getDataAsRecordList(), "teams"));
+                        processResponse(requestId, response);
+                    }
+                });
+            } else {
+                final String sourceId = parentId.substring(parentId.indexOf(":") + 1);
+
+                DataSource.get("players").fetchData(new Criteria("teamId", sourceId), new DSCallback() {
+                    @Override
+                    public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
+                        response.setData(getRecords(fetchResponse.getDataAsRecordList(), "players"));
+                        processResponse(requestId, response);
+                    }
+                });
+            }
         }
 
         return request.getData();
-    }
-
-    private void executeFetch(final String requestId, final DSRequest request, final DSResponse response) {
-        final String parentId = request.getCriteria().getAttributeAsString("parentId");
-
-        if (parentId == null) {
-            DataSource.get("teams").fetchData(null, new DSCallback() {
-                @Override
-                public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
-                    response.setData(getRecords(fetchResponse.getDataAsRecordList(), "teams"));
-                    processResponse(requestId, response);
-                }
-            });
-        } else {
-            final String sourceId = parentId.substring(parentId.indexOf(":") + 1);
-
-            DataSource.get("players").fetchData(new Criteria("teamId", sourceId), new DSCallback() {
-                @Override
-                public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
-                    response.setData(getRecords(fetchResponse.getDataAsRecordList(), "players"));
-                    processResponse(requestId, response);
-                }
-            });
-        }
     }
 
     private Record[] getRecords(final RecordList recordList, final String dataSourceName) {

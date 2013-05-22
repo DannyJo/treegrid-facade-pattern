@@ -18,7 +18,7 @@ you a sample of both methods.
 
 This sample implementation uses two underlying datasources, teams and players. A team has players and a player only has one team.
 
-teams.ds.xml
+__teams.ds.xml__
 
     <DataSource ID="teams"
                 serverType="sql"
@@ -34,7 +34,7 @@ teams.ds.xml
     </DataSource>
 
 
-players.ds.xml
+__players.ds.xml__
 
     <DataSource ID="players"
                 serverType="sql"
@@ -52,11 +52,11 @@ players.ds.xml
     </DataSource>
 
 
-## Server side implementation
+### Server side
 
 In order to start this off, we need to create a generic datasource.
 
-treeFacadeDS.ds.xml
+__treeFacadeDS.ds.xml__
 
     <DataSource ID="treeFacadeDS"
                 serverType="generic"
@@ -72,7 +72,7 @@ Now this is pretty straight forward, just like a normal datasource except we spe
 which is a fully qualified identifier for the server side class that implements this datasource. More information on custom datasource can
 be found at http://www.smartclient.com/smartgwtee/javadoc/com/smartgwt/client/docs/WriteCustomDataSource.html
 
-TreeFacadeDS.java
+__TreeFacadeDS.java__
 
     package com.smartgwt.sample.server;
 
@@ -199,7 +199,96 @@ used on the client side when we edit the items in the TreeGrid.
 
 
 
+### Client side
 
+Now in order to use a client side implementation to create a facade datasource all we need to do is create a class that extends the
+com.smartgwt.client.data.DataSource class. This will be very similar to the server side datasource class especially in the way the data
+is mapped across to the format the TreeGrid can understand.
 
+__TreeFacadeClientDS.java__
 
-## Client side implementation
+    package com.smartgwt.sample.client;
+
+    import com.smartgwt.client.data.*;
+    import com.smartgwt.client.types.DSOperationType;
+    import com.smartgwt.client.types.DSProtocol;
+    import com.smartgwt.client.types.FieldType;
+
+    public class TreeFacadeClientDS extends DataSource {
+
+        public TreeFacadeClientDS() {
+            super();
+
+            setDataProtocol(DSProtocol.CLIENTCUSTOM);
+            setAutoCacheAllData(true);
+
+            final DataSourceField idField = new DataSourceField("id", FieldType.TEXT);
+            idField.setPrimaryKey(true);
+            idField.setHidden(true);
+            final DataSourceField nameField = new DataSourceField("name", FieldType.TEXT);
+
+            setFields(idField, nameField);
+        }
+
+        @Override
+        protected Object transformRequest(final DSRequest request) {
+            final String requestId = request.getRequestId();
+            final DSResponse response = new DSResponse();
+
+            if (DSOperationType.FETCH.equals(request.getOperationType())) {
+                final String parentId = request.getCriteria().getAttributeAsString("parentId");
+
+                if (parentId == null) {
+                    DataSource.get("teams").fetchData(null, new DSCallback() {
+                        @Override
+                        public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
+                            response.setData(getRecords(fetchResponse.getDataAsRecordList(), "teams"));
+                            processResponse(requestId, response);
+                        }
+                    });
+                } else {
+                    final String sourceId = parentId.substring(parentId.indexOf(":") + 1);
+
+                    DataSource.get("players").fetchData(new Criteria("teamId", sourceId), new DSCallback() {
+                        @Override
+                        public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
+                            response.setData(getRecords(fetchResponse.getDataAsRecordList(), "players"));
+                            processResponse(requestId, response);
+                        }
+                    });
+                }
+            }
+
+            return request.getData();
+        }
+
+        private Record[] getRecords(final RecordList recordList, final String dataSourceName) {
+            final Record[] records = new Record[recordList.getLength()];
+
+            for (int i = 0; i < recordList.getLength(); i++) {
+                records[i] = new Record();
+
+                if ("players".equalsIgnoreCase(dataSourceName)) {
+                    records[i].setAttribute("parentId", "teams:" + recordList.get(i).getAttributeAsString("teamId"));
+                    records[i].setAttribute("id", "players:" + recordList.get(i).getAttributeAsString("id"));
+                    records[i].setAttribute("icon", "player.png");
+                    records[i].setAttribute("isFolder", false);
+                } else {
+                    records[i].setAttribute("id", "teams:" + recordList.get(i).getAttributeAsString("id"));
+                    records[i].setAttribute("isFolder", true);
+                }
+
+                records[i].setAttribute("name", recordList.get(i).getAttributeAsString("name"));
+                records[i].setAttribute("dataSourceName", dataSourceName);
+                records[i].setAttribute("data", recordList.get(i));
+            }
+
+            return records;
+        }
+    }
+
+In this datasource we have a __getRecords()__ method which should look pretty familiar, all it does is map the data from the underlying
+datasources into the format the TreeGrid will understand. Now the other method __transformRequest()__ is the actual datasource proxy method
+which takes care of delegating the request to the underlying datasources. The difference from the server side implementation is that instead
+of create a new DSRequest we simply get an instance of the underlying datasource using __DataSource.get()__ and then call __fetchData()__
+with a criteria and a callback.
