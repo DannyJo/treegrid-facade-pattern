@@ -3,8 +3,16 @@
         "http://google-web-toolkit.googlecode.com/svn/tags/1.7.0/distro-source/core/src/gwt-module.dtd">
 <module rename-to="treegridfacadepattern">
     <inherits name='com.google.gwt.user.User'/>
+    <inherits name='com.google.gwt.i18n.I18N'/>
     <inherits name="com.smartgwt.tools.SmartGwtTools"/>
     <inherits name="com.smartgwtee.tools.Tools"/>
-    <inherits name="com.smartgwtee.SmartGwtEE"/>
+    <inherits name="com.smartgwtee.SmartGwtEENoScript"/>
+    <inherits name="com.smartgwt.DrawingNoScript"/>
+    <inherits name="com.smartclient.theme.simplicity.SimplicityResources"/>
+    <inherits name="com.smartgwt.ChartsNoScript"/>
+
+    <add-linker name="xsiframe"/>
+    <set-configuration-property name="devModeRedirectEnabled" value="true"/>
+
     <entry-point class='com.smartgwt.sample.client.TreeGridFacadePatternModule'/>
 </module>
