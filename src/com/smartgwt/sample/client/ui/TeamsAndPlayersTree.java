@@ -19,21 +19,16 @@ public class TeamsAndPlayersTree extends TreeGrid {
     }
 
     public void updateCache() {
-        updateCache(null, DSOperationType.UPDATE);
+        updateCache(null);
     }
 
-    public void updateCache(final String parentId, final DSOperationType operationType) {
+    public void updateCache(final String parentId) {
         getDataSource().fetchData(new Criteria("parentId", parentId), new DSCallback() {
             @Override
             public void execute(final DSResponse response, final Object rawData, final DSRequest request) {
-                response.setOperationType(operationType);
-                request.setOperationType(operationType);
+                request.setOperationType(DSOperationType.UPDATE);
                 getDataSource().updateCaches(response, request);
             }
         });
-    }
-
-    public void updateCacheUsingResponse(final DSResponse response) {
-        getDataSource().updateCaches(response);
     }
 }

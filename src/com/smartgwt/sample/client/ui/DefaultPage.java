@@ -62,7 +62,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                 new AddEditModalDialog("Add Player", "players", null, new DSCallback() {
                     @Override
                     public void execute(DSResponse response, Object rawData, DSRequest request) {
-                        teamsAndPlayersTree.updateCache("teams:" + String.valueOf(request.getAttributeAsMap("data").get("teamId")), DSOperationType.UPDATE);
+                        teamsAndPlayersTree.updateCache("teams:" + String.valueOf(request.getAttributeAsMap("data").get("teamId")));
                     }
                 }).show();
             }
@@ -90,7 +90,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                     public void execute(DSResponse response, Object rawData, DSRequest request) {
                         final String teamId = String.valueOf(request.getAttributeAsMap("data").get("teamId"));
                         final String parentId = teamId != null && !"null".equalsIgnoreCase(teamId) ? "teams:" + teamId : null;
-                        teamsAndPlayersTree.updateCache(parentId, DSOperationType.UPDATE);
+                        teamsAndPlayersTree.updateCache(parentId);
                     }
                 }).show();
             }
@@ -107,6 +107,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                     return;
                 }
 
+                // Display confirmation dialog before deleting item
                 SC.confirm("Are you sure you want to delete '" + teamsAndPlayersTree.getSelectedRecord().getAttributeAsString("name") + "'?", new BooleanCallback() {
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -121,7 +122,7 @@ public class DefaultPage extends VLayout implements TopToolStrip.OnModeChange {
                                 public void execute(DSResponse response, Object rawData, DSRequest request) {
                                     // Once the record has been deleted from the underlying datasource lets issue a REMOVE to the tree's cache and get rid of this node.
                                     final DSResponse deleteResponse = new DSResponse(teamsAndPlayersTree.getDataSource().getID(), DSOperationType.REMOVE, teamsAndPlayersTree.getSelectedRecord());
-                                    teamsAndPlayersTree.updateCacheUsingResponse(deleteResponse);
+                                    teamsAndPlayersTree.getDataSource().updateCaches(deleteResponse);
                                 }
                             }, request);
                         }

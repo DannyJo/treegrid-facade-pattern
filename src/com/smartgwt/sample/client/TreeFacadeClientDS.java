@@ -14,10 +14,11 @@ public class TreeFacadeClientDS extends DataSource {
         setAutoCacheAllData(true);
 
         final DataSourceField idField = new DataSourceField("id", FieldType.TEXT);
+        idField.setPrimaryKey(true);
+        idField.setHidden(true);
         final DataSourceField nameField = new DataSourceField("name", FieldType.TEXT);
-        final DataSourceField parentIdField = new DataSourceField("parentId", FieldType.TEXT);
 
-        setFields(idField, nameField, parentIdField);
+        setFields(idField, nameField);
     }
 
     @Override
