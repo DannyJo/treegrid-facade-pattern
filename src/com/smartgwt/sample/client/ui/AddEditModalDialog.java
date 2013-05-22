@@ -78,18 +78,20 @@ public class AddEditModalDialog extends Window {
         saveButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                form.saveData(new DSCallback() {
-                    @Override
-                    public void execute(final DSResponse response, Object rawData, DSRequest request) {
-                        if (callback != null) {
-                            callback.execute(response, rawData, request);
+                if (form.validate()) {
+                    form.saveData(new DSCallback() {
+                        @Override
+                        public void execute(final DSResponse response, Object rawData, DSRequest request) {
+                            if (callback != null) {
+                                callback.execute(response, rawData, request);
+                            }
+
+                            dialogInstance.destroy();
                         }
+                    });
 
-                        dialogInstance.destroy();
-                    }
-                });
-
-                dialogInstance.hide();
+                    dialogInstance.hide();
+                }
             }
         });
 

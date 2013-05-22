@@ -1,20 +1,12 @@
-<DataSource
-        ID="teams"
-        serverType="sql"
-        tableName="teams"
-        recordName="team"
-        testFileName="teams.data.xml"
-        titleField="name">
+<DataSource ID="teams"
+            serverType="sql"
+            tableName="teams"
+            recordName="team"
+            testFileName="teams.data.xml"
+            titleField="name">
 
     <fields>
         <field name="id" title="ID" type="sequence" primaryKey="true" hidden="true"/>
         <field name="name" title="Name" type="text" length="128"/>
     </fields>
-    <!--
-        <operationBindings>
-            <operationBinding operationType="fetch">
-                <orderClause>name</orderClause>
-            </operationBinding>
-        </operationBindings>
-    -->
 </DataSource>

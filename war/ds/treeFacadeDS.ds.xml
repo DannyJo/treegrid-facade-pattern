@@ -1,7 +1,6 @@
-<DataSource
-        ID="treeFacadeDS"
-        serverType="generic"
-        serverConstructor="com.smartgwt.sample.server.TreeFacadeDS">
+<DataSource ID="treeFacadeDS"
+            serverType="generic"
+            serverConstructor="com.smartgwt.sample.server.TreeFacadeDS">
 
     <fields>
         <field name="id" title="id" type="text" primaryKey="true" hidden="true"/>

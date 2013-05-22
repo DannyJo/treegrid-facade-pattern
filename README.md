@@ -193,6 +193,13 @@ We've got a method that will translate the records for us.
         return treeItem;
     }
 
-This just copies the properties from the teams and players datasource records into the Map the TreeGrid will understand how to handle.
-Something important to note here is the property called "data" which is the native record from the underlying datasource. This will be
+This copies the properties from the teams and players datasource records into the Map the TreeGrid will understand how to handle.
+Something important to note here is the property called __data__ which is the native record from the underlying datasource. This will be
 used on the client side when we edit the items in the TreeGrid.
+
+
+
+
+
+
+## Client side implementation

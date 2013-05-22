@@ -7,8 +7,9 @@
 
     <fields>
         <field name="id" title="ID" type="sequence" primaryKey="true" hidden="true"/>
-        <field name="name" title="Name" type="text" length="128"/>
-        <field name="teamId" title="Team" optionsDataSource="teams" valueField="id" displayField="name" foreignKey="teams.id"/>
+        <field name="name" title="Name" type="text" length="128" required="true"/>
+        <field name="teamId" title="Team" optionsDataSource="teams" valueField="id" displayField="name" foreignKey="teams.id"
+               required="true"/>
         <field name="team" includeFrom="teams.name" hidden="true"/>
     </fields>
 </DataSource>
