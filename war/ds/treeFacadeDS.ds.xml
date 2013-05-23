@@ -1,9 +1,7 @@
-<DataSource ID="treeFacadeDS"
-            serverType="generic"
-            serverConstructor="com.smartgwt.sample.server.TreeFacadeDS">
-
+<DataSource ID="treeFacadeDS" serverConstructor="com.smartgwt.sample.server.TreeFacadeDS">
     <fields>
         <field name="id" title="id" type="text" primaryKey="true" hidden="true"/>
+        <field name="parentId" title="parent" type="text" foreignKey="id" hidden="true"/>
         <field name="name" title="name" type="text"/>
     </fields>
 </DataSource>

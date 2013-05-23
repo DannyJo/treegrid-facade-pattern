@@ -21,11 +21,15 @@ public class TreeFacadeClientDS extends DataSource {
         idField.setPrimaryKey(true);
         idField.setHidden(true);
 
+        // This is the parent id, also the foreign key field.
+        final DataSourceField parentIdField = new DataSourceField("parentId", FieldType.TEXT);
+        parentIdField.setForeignKey("id");
+
         // This is the only field we actually display in the tree, the name.
         final DataSourceField nameField = new DataSourceField("name", FieldType.TEXT);
 
         // Set the fields on the datasource.
-        setFields(idField, nameField);
+        setFields(idField, parentIdField, nameField);
     }
 
     @Override
@@ -48,12 +52,12 @@ public class TreeFacadeClientDS extends DataSource {
                         processResponse(requestId, response); // This will ensure that the response is processed and returned to the component.
                     }
                 });
-            } else {
+            } else if (parentId.startsWith("teams:")) {
                 // Now if we have a parentId and because our parentIds look like "datasourcename:id" we need to string parse it to get the id.
-                final String sourceId = parentId.substring(parentId.indexOf(":") + 1);
+                final String teamId = parentId.substring(parentId.indexOf(":") + 1);
 
                 // Using DataSource.fetchData() we now use a criteria to fetch all players in the specific team.
-                DataSource.get("players").fetchData(new Criteria("teamId", sourceId), new DSCallback() {
+                DataSource.get("players").fetchData(new Criteria("teamId", teamId), new DSCallback() {
                     @Override
                     public void execute(final DSResponse fetchResponse, final Object rawData, final DSRequest fetchRequest) {
                         response.setData(convertToTreeItem(fetchResponse.getDataAsRecordList(), "players"));
